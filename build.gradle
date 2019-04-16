@@ -1,0 +1,48 @@
+apply plugin: 'groovy'
+
+repositories {
+   mavenCentral()
+}
+
+dependencies {
+   compile 'org.codehaus.groovy:groovy-all:2.4.15'
+   compile 'commons-cli:commons-cli:1.4'
+   testCompile 'junit:junit:4.12'
+}
+
+//dependencies {
+//    compile localGroovy()
+//}
+
+test {
+    useJUnit()
+
+    maxHeapSize = '1G'
+}
+
+task testGroup(type: Test) {
+   include '**/TestSuite.class'
+   reports.junitXml.destination = "$buildDir/test-results/TestSuite"
+   reports.html.destination = "$buildDir/test-results/TestSuite"
+}
+
+task robotRun(type: JavaExec) {
+    description 'Run Groovy Robot application'
+ 
+    // Set main property to name of Groovy script class.
+    main = 'com.robots.RobotRun'
+ 
+    // Set classpath for running the Groovy script.
+    classpath = sourceSets.main.runtimeClasspath
+ 
+    if (project.hasProperty('custom')) {
+        // Pass command-line argument to script.
+        args project.getProperty('custom')
+    }
+
+    if(project.hasProperty("command-file-name")) {
+        args "--command-file-name", project["command-file-name"]
+    }
+}
+ 
+defaultTasks 'robotRun'
